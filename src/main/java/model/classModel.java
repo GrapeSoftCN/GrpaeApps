@@ -49,10 +49,10 @@ public class classModel {
 		for (Object object2 : appclassInfo.keySet()) {
 			appclass.eq(object2.toString(), appclassInfo.get(object2.toString()));
 		}
-		return appclass.select();
+		return appclass.limit(20).select();
 	}
 	public JSONArray search(String sysid) {
-		return appclass.eq("sid", sysid).select();
+		return appclass.eq("sid", sysid).limit(20).select();
 	}
 	public JSONObject find(String clsid) {
 		return appclass.eq("id", clsid).find();

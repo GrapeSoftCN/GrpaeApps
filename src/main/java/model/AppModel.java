@@ -53,10 +53,10 @@ public class AppModel {
 		for (Object object2 : appInfo.keySet()) {
 			appserver.eq(object2.toString(), appInfo.get(object2.toString()));
 		}
-		return appserver.select();
+		return appserver.limit(20).select();
 	}
 	public String search(String sysid) {
-		return appserver.eq("sysid", sysid).select().toString();
+		return appserver.eq("sysid", sysid).limit(20).select().toString();
 	}
 	public JSONObject find(String appssid) {
 		return appserver.eq("id", appssid).find();

@@ -51,11 +51,11 @@ public class interfaceModel {
 		for (Object object2 : appinterfaceInfo.keySet()) {
 			appinterface.eq(object2.toString(), appinterfaceInfo.get(object2.toString()));
 		}
-		return appinterface.select();
+		return appinterface.limit(20).select();
 	}
 
 	public JSONArray search(String classid) {
-		return appinterface.eq("appclsid", classid).select();
+		return appinterface.eq("appclsid", classid).limit(20).select();
 	}
 	public JSONObject find(String id) {
 		return appinterface.eq("id", id).find();

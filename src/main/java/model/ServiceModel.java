@@ -49,7 +49,7 @@ public class ServiceModel {
 		for (Object object2 : serviceInfo.keySet()) {
 			service.eq(object2.toString(), serviceInfo.get(object2.toString()));
 		}
-		return service.select();
+		return service.limit(20).select();
 	}
 	public JSONObject search(String sid) {
 		return service.eq("id", sid).find();

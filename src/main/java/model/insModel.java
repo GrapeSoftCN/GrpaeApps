@@ -64,7 +64,7 @@ public class insModel {
 		for (Object object2 : insInfo.keySet()) {
 			ins.eq(object2.toString(), insInfo.get(object2.toString()));
 		}
-		return getServiceName(ins.select());
+		return getServiceName(ins.limit(20).select());
 	}
 
 	public JSONArray search(String[] meta) {
@@ -72,7 +72,7 @@ public class insModel {
 		for (int i = 0; i < meta.length; i++) {
 			ins.eq("id", meta[i]);
 		}
-		return getServiceName(ins.select());
+		return getServiceName(ins.limit(20).select());
 	}
 
 	public JSONObject find(String insid) {
@@ -80,7 +80,7 @@ public class insModel {
 	}
 
 	public String search(String sysid) {
-		return ins.eq("sysid", sysid).select().toString();
+		return ins.eq("sysid", sysid).limit(20).select().toString();
 	}
 
 	public JSONObject page(int idx, int pageSize) {
