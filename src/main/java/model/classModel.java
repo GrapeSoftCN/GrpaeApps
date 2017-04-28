@@ -22,8 +22,8 @@ public class classModel {
 		if (appclassInfo.containsKey("id")) {
 			appclassInfo.remove("id");
 		}
-			Object info = appclass.data(appclassInfo).insertOnce();
-			return find(info.toString()).toString();
+		Object info = appclass.data(appclassInfo).insertOnce();
+		return find(info.toString()).toString();
 	}
 
 	public int update(String aid, JSONObject appclassInfo) {
@@ -38,11 +38,11 @@ public class classModel {
 	}
 
 	public int delete(String[] ids) {
-		appclass = (DBHelper) appclass.or();
+		appclass.or();
 		for (int i = 0; i < ids.length; i++) {
 			appclass.eq("id", ids[i]);
 		}
-		return appclass.delete() != null ? 0 : 99;
+		return appclass.deleteAll() != ids.length ? 0 : 99;
 	}
 
 	public JSONArray search(JSONObject appclassInfo) {
@@ -51,54 +51,50 @@ public class classModel {
 		}
 		return appclass.limit(20).select();
 	}
+
 	public JSONArray search(String sysid) {
 		return appclass.eq("sid", sysid).limit(20).select();
 	}
+
 	public JSONObject find(String clsid) {
 		return appclass.eq("id", clsid).find();
 	}
 
+	@SuppressWarnings("unchecked")
 	public JSONObject page(int idx, int pageSize) {
 		JSONArray array = appclass.page(idx, pageSize);
-		@SuppressWarnings("unchecked")
-		JSONObject object = new JSONObject() {
-			private static final long serialVersionUID = 1L;
-			{
-				put("totalSize", (int) Math.ceil((double) appclass.count() / pageSize));
-				put("currentPage", idx);
-				put("pageSize", pageSize);
-				put("data", array);
-			}
-		};
+		JSONObject object = new JSONObject();
+		object.put("totalSize", (int) Math.ceil((double) appclass.count() / pageSize));
+		object.put("currentPage", idx);
+		object.put("pageSize", pageSize);
+		object.put("data", array);
 		return object;
 	}
 
+	@SuppressWarnings("unchecked")
 	public JSONObject page(int idx, int pageSize, JSONObject userInfo) {
 		for (Object object2 : userInfo.keySet()) {
 			appclass.eq(object2.toString(), userInfo.get(object2.toString()));
 		}
 		JSONArray array = appclass.page(idx, pageSize);
-		@SuppressWarnings("unchecked")
-		JSONObject object = new JSONObject() {
-			private static final long serialVersionUID = 1L;
-			{
-				put("totalSize", (int) Math.ceil((double) appclass.count() / pageSize));
-				put("currentPage", idx);
-				put("pageSize", pageSize);
-				put("data", array);
-			}
-		};
+		JSONObject object = new JSONObject();
+		object.put("totalSize", (int) Math.ceil((double) appclass.count() / pageSize));
+		object.put("currentPage", idx);
+		object.put("pageSize", pageSize);
+		object.put("data", array);
 		return object;
 	}
+
 	/**
 	 * 将map添加至JSONObject
+	 * 
 	 * @param map
 	 * @param object
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")
-	public JSONObject AddMap(HashMap<String, Object> map,JSONObject object) {
-		if (map.entrySet()!=null) {
+	public JSONObject AddMap(HashMap<String, Object> map, JSONObject object) {
+		if (map.entrySet() != null) {
 			Iterator<Entry<String, Object>> iterator = map.entrySet().iterator();
 			while (iterator.hasNext()) {
 				Map.Entry<String, Object> entry = (Map.Entry<String, Object>) iterator.next();
@@ -109,6 +105,7 @@ public class classModel {
 		}
 		return object;
 	}
+
 	public String resultMessage(int num, String message) {
 		String msg = "";
 		switch (num) {

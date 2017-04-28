@@ -40,11 +40,11 @@ public class interfaceModel {
 	}
 
 	public int delete(String[] ids) {
-		appinterface = (DBHelper) appinterface.or();
+		appinterface.or();
 		for (int i = 0; i < ids.length; i++) {
 			appinterface.eq("id", ids[i]);
 		}
-		return appinterface.delete() != null ? 0 : 99;
+		return appinterface.deleteAll() != ids.length ? 0 : 99;
 	}
 
 	public JSONArray search(JSONObject appinterfaceInfo) {
@@ -61,36 +61,28 @@ public class interfaceModel {
 		return appinterface.eq("id", id).find();
 	}
 
+	@SuppressWarnings("unchecked")
 	public JSONObject page(int idx, int pageSize) {
 		JSONArray array = appinterface.page(idx, pageSize);
-		@SuppressWarnings("unchecked")
-		JSONObject object = new JSONObject() {
-			private static final long serialVersionUID = 1L;
-			{
-				put("totalSize", (int) Math.ceil((double) appinterface.count() / pageSize));
-				put("currentPage", idx);
-				put("pageSize", pageSize);
-				put("data", array);
-			}
-		};
+		JSONObject object = new JSONObject();
+		object.put("totalSize", (int) Math.ceil((double) appinterface.count() / pageSize));
+		object.put("currentPage", idx);
+		object.put("pageSize", pageSize);
+		object.put("data", array);
 		return object;
 	}
 
+	@SuppressWarnings("unchecked")
 	public JSONObject page(int idx, int pageSize, JSONObject userInfo) {
 		for (Object object2 : userInfo.keySet()) {
 			appinterface.eq(object2.toString(), userInfo.get(object2.toString()));
 		}
 		JSONArray array = appinterface.page(idx, pageSize);
-		@SuppressWarnings("unchecked")
-		JSONObject object = new JSONObject() {
-			private static final long serialVersionUID = 1L;
-			{
-				put("totalSize", (int) Math.ceil((double) appinterface.count() / pageSize));
-				put("currentPage", idx);
-				put("pageSize", pageSize);
-				put("data", array);
-			}
-		};
+		JSONObject object = new JSONObject();
+		object.put("totalSize", (int) Math.ceil((double) appinterface.count() / pageSize));
+		object.put("currentPage", idx);
+		object.put("pageSize", pageSize);
+		object.put("data", array);
 		return object;
 	}
 	/**

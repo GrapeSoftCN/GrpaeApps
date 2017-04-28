@@ -43,11 +43,11 @@ public class AppModel {
 		return appserver.eq("id", aid).delete()!=null?0:99;
 	}
 	public int delete(String[] ids) {
-		appserver = (DBHelper)appserver.or();
-		for (int i = 0; i < ids.length; i++) {
+		appserver.or();
+		for (int i = 0,len = ids.length; i < len; i++) {
 			appserver.eq("id", ids[i]);
 		}
-		return appserver.delete()!=null?0:99;
+		return appserver.deleteAll()!= ids.length?0:99;
 	}
 	public JSONArray search(JSONObject appInfo) {
 		for (Object object2 : appInfo.keySet()) {
@@ -73,21 +73,17 @@ public class AppModel {
 		return object;
 	}
 	
+	@SuppressWarnings("unchecked")
 	public JSONObject page(int idx,int pageSize,JSONObject userInfo){
 		for (Object object2 : userInfo.keySet()) {
 			appserver.eq(object2.toString(), userInfo.get(object2.toString()));
 		}
 		JSONArray array = appserver.page(idx, pageSize);
-		@SuppressWarnings("unchecked")
-		JSONObject object = new JSONObject(){
-			private static final long serialVersionUID = 1L;
-			{
-				put("totalSize", (int)Math.ceil((double)appserver.count()/pageSize));
-				put("currentPage", idx);
-				put("pageSize", pageSize);
-				put("data", array);
-			}
-		};
+		JSONObject object = new JSONObject();
+		object.put("totalSize", (int)Math.ceil((double)appserver.count()/pageSize));
+		object.put("currentPage", idx);
+		object.put("pageSize", pageSize);
+		object.put("data", array);
 		return object;
 	}
 	@SuppressWarnings("unchecked")

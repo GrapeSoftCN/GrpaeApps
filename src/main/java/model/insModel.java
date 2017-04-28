@@ -29,7 +29,7 @@ public class insModel {
 	public String insert(JSONObject insInfo) {
 		if (!_form.checkRuleEx(insInfo)) {
 			return resultMessage(1, ""); // 非空字段验证
-		}else{
+		} else {
 			Object info = ins.data(insInfo).insertOnce();
 			return getServiceName(find(info.toString())).toString();
 		}
@@ -53,11 +53,11 @@ public class insModel {
 	}
 
 	public int delete(String[] ids) {
-		ins = (DBHelper) ins.or();
+		ins.or();
 		for (int i = 0; i < ids.length; i++) {
 			ins.eq("id", ids[i]);
 		}
-		return ins.delete() != null ? 0 : 99;
+		return ins.deleteAll() != ids.length ? 0 : 99;
 	}
 
 	public JSONArray search(JSONObject insInfo) {
@@ -83,36 +83,28 @@ public class insModel {
 		return ins.eq("sysid", sysid).limit(20).select().toString();
 	}
 
+	@SuppressWarnings("unchecked")
 	public JSONObject page(int idx, int pageSize) {
 		JSONArray array = getServiceName(ins.page(idx, pageSize));
-		@SuppressWarnings("unchecked")
-		JSONObject object = new JSONObject() {
-			private static final long serialVersionUID = 1L;
-			{
-				put("totalSize", (int) Math.ceil((double) ins.count() / pageSize));
-				put("currentPage", idx);
-				put("pageSize", pageSize);
-				put("data", array);
-			}
-		};
+		JSONObject object = new JSONObject();
+		object.put("totalSize", (int) Math.ceil((double) ins.count() / pageSize));
+		object.put("currentPage", idx);
+		object.put("pageSize", pageSize);
+		object.put("data", array);
 		return object;
 	}
 
+	@SuppressWarnings("unchecked")
 	public JSONObject page(int idx, int pageSize, JSONObject userInfo) {
 		for (Object object2 : userInfo.keySet()) {
 			ins.eq(object2.toString(), userInfo.get(object2.toString()));
 		}
 		JSONArray array = getServiceName(ins.page(idx, pageSize));
-		@SuppressWarnings("unchecked")
-		JSONObject object = new JSONObject() {
-			private static final long serialVersionUID = 1L;
-			{
-				put("totalSize", (int) Math.ceil((double) ins.count() / pageSize));
-				put("currentPage", idx);
-				put("pageSize", pageSize);
-				put("data", array);
-			}
-		};
+		JSONObject object = new JSONObject();
+		object.put("totalSize", (int) Math.ceil((double) ins.count() / pageSize));
+		object.put("currentPage", idx);
+		object.put("pageSize", pageSize);
+		object.put("data", array);
 		return object;
 	}
 
@@ -132,7 +124,7 @@ public class insModel {
 				if (!object.containsKey(entry.getKey())) {
 					object.put(entry.getKey(), entry.getValue());
 				}
-				
+
 			}
 		}
 		return object;
@@ -147,16 +139,17 @@ public class insModel {
 		JSONArray insInfo = new JSONArray();
 		for (int i = 0; i < array.size(); i++) {
 			JSONObject object = (JSONObject) array.get(i);
-			object.put("servicename", new ServiceModel().search(object.get("sid").toString())
-					.get("serviceName").toString());
+			object.put("servicename",
+					new ServiceModel().search(object.get("sid").toString()).get("serviceName").toString());
 			insInfo.add(object);
 		}
 		return insInfo;
 	}
+
 	@SuppressWarnings("unchecked")
 	public JSONObject getServiceName(JSONObject object) {
 		JSONObject object2 = new ServiceModel().search(object.get("sid").toString());
-		if (object2!=null) {
+		if (object2 != null) {
 			object.put("servicename", object2.get("serviceName").toString());
 		}
 		return object;
