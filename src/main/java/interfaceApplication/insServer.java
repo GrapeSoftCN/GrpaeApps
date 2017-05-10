@@ -16,6 +16,7 @@ public class insServer {
 		map.put("configName", "");
 		map.put("sysid", 0);
 		map.put("sid", 0);
+		map.put("desp", "");
 	}
 	public String insInsert(String insInfo) {
 		JSONObject o = model.AddMap(map, JSONHelper.string2json(insInfo));

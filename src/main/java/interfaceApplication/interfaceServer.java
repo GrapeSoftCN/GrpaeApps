@@ -13,20 +13,25 @@ public class interfaceServer {
 	private interfaceModel model = new interfaceModel();
 	private JSONObject _obj = new JSONObject();
 	private HashMap<String, Object> map = new HashMap<>();
+
 	public interfaceServer() {
 		map.put("interface", "");
 		map.put("readtime", 0);
 		map.put("desp", "");
 		map.put("appclsid", 0);
 	}
+
 	public String interfaceInsert(String interfaceInfo) {
-		JSONObject object =model.AddMap(map, JSONHelper.string2json(interfaceInfo));
-		_obj.put("records",StringEscapeUtils.unescapeJava(model.insert(object)));
-		return model.resultMessage(0,_obj.toString());
+		JSONObject object = model.AddMap(map,
+				JSONHelper.string2json(interfaceInfo));
+		_obj.put("records",
+				StringEscapeUtils.unescapeJava(model.insert(object)));
+		return model.resultMessage(0, _obj.toString());
 	}
 
 	public String interfaceUpdate(String id, String interfaceInfo) {
-		return model.resultMessage(model.update(id, JSONHelper.string2json(interfaceInfo)),
+		return model.resultMessage(
+				model.update(id, JSONHelper.string2json(interfaceInfo)),
 				"修改接口成功");
 	}
 
@@ -39,22 +44,23 @@ public class interfaceServer {
 	}
 
 	public String interfaceSearch(String interfaceInfo) {
-		_obj.put("records", model.search(JSONHelper.string2json(interfaceInfo)));
-		return StringEscapeUtils.unescapeJava(model.resultMessage(0, _obj.toString()));
+		_obj.put("records",
+				model.search(JSONHelper.string2json(interfaceInfo)));
+		return StringEscapeUtils
+				.unescapeJava(model.resultMessage(0, _obj.toString()));
 	}
 
 	public String interfaceFind(String clsid) {
 		_obj.put("records", model.search(clsid));
-		return StringEscapeUtils.unescapeJava(model.resultMessage(0, _obj.toString()));
+		return StringEscapeUtils
+				.unescapeJava(model.resultMessage(0, _obj.toString()));
 	}
 
 	public String interfacePage(int idx, int pageSize) {
-		_obj.put("records", model.page(idx, pageSize));
-		return StringEscapeUtils.unescapeJava(model.resultMessage(0, _obj.toString()));
+		return model.page(idx, pageSize);
 	}
 
 	public String interfacePageBy(int idx, int pageSize, String interfaceInfo) {
-		_obj.put("records", model.page(idx, pageSize, JSONHelper.string2json(interfaceInfo)));
-		return StringEscapeUtils.unescapeJava(model.resultMessage(0, _obj.toString()));
+		return model.page(idx, pageSize, JSONHelper.string2json(interfaceInfo));
 	}
 }

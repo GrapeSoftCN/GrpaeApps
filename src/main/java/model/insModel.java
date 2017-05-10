@@ -17,6 +17,8 @@ import jodd.util.ArraysUtil;
 public class insModel {
 	private static DBHelper ins;
 	private static formHelper _form;
+	private JSONObject _obj = new JSONObject();
+
 	static {
 		ins = new DBHelper("localdb", "ins");
 		_form = ins.getChecker();
@@ -29,19 +31,18 @@ public class insModel {
 	public String insert(JSONObject insInfo) {
 		if (!_form.checkRuleEx(insInfo)) {
 			return resultMessage(1, ""); // 非空字段验证
-		} else {
-			Object info = ins.data(insInfo).insertOnce();
-			return getServiceName(find(info.toString())).toString();
 		}
-		// return ins.data(insInfo).insertOnce() != null ? 0 : 99;
+		if (find(insInfo.get("sid").toString(),
+				insInfo.get("configName").toString(),
+				insInfo.get("sysid").toString())!=null) {
+			return resultMessage(2, "");
+		}
+		String info = ins.data(insInfo).insertOnce().toString();
+
+		return getServiceName(find(info.toString())).toString();
 	}
 
 	public int update(String aid, JSONObject insInfo) {
-		// if (insInfo.containsKey("configname")) {
-		// if (!_form.checkRuleEx(insInfo)) {
-		// return 1; // 非空字段验证
-		// }
-		// }
 		if (insInfo.containsKey("id")) {
 			insInfo.remove("id");
 		}
@@ -79,6 +80,11 @@ public class insModel {
 		return ins.eq("id", insid).find();
 	}
 
+	public JSONObject find(String sid, String configName, String sysid) {
+		return ins.and().eq("sid", sid).eq("configName", configName)
+				.eq("sysid", sysid).find();
+	}
+
 	public String search(String sysid) {
 		return ins.eq("sysid", sysid).limit(20).select().toString();
 	}
@@ -87,7 +93,8 @@ public class insModel {
 	public JSONObject page(int idx, int pageSize) {
 		JSONArray array = getServiceName(ins.page(idx, pageSize));
 		JSONObject object = new JSONObject();
-		object.put("totalSize", (int) Math.ceil((double) ins.count() / pageSize));
+		object.put("totalSize",
+				(int) Math.ceil((double) ins.count() / pageSize));
 		object.put("currentPage", idx);
 		object.put("pageSize", pageSize);
 		object.put("data", array);
@@ -101,7 +108,8 @@ public class insModel {
 		}
 		JSONArray array = getServiceName(ins.page(idx, pageSize));
 		JSONObject object = new JSONObject();
-		object.put("totalSize", (int) Math.ceil((double) ins.count() / pageSize));
+		object.put("totalSize",
+				(int) Math.ceil((double) ins.count() / pageSize));
 		object.put("currentPage", idx);
 		object.put("pageSize", pageSize);
 		object.put("data", array);
@@ -118,9 +126,11 @@ public class insModel {
 	@SuppressWarnings("unchecked")
 	public JSONObject AddMap(HashMap<String, Object> map, JSONObject object) {
 		if (map.entrySet() != null) {
-			Iterator<Entry<String, Object>> iterator = map.entrySet().iterator();
+			Iterator<Entry<String, Object>> iterator = map.entrySet()
+					.iterator();
 			while (iterator.hasNext()) {
-				Map.Entry<String, Object> entry = (Map.Entry<String, Object>) iterator.next();
+				Map.Entry<String, Object> entry = (Map.Entry<String, Object>) iterator
+						.next();
 				if (!object.containsKey(entry.getKey())) {
 					object.put(entry.getKey(), entry.getValue());
 				}
@@ -135,12 +145,25 @@ public class insModel {
 	}
 
 	@SuppressWarnings("unchecked")
+	public String resultMessage(JSONObject object) {
+		_obj.put("records", object);
+		return resultMessage(0, _obj.toString());
+	}
+
+	@SuppressWarnings("unchecked")
+	public String resultMessage(JSONArray array) {
+		_obj.put("records", array);
+		return resultMessage(0, _obj.toString());
+	}
+
+	@SuppressWarnings("unchecked")
 	public JSONArray getServiceName(JSONArray array) {
 		JSONArray insInfo = new JSONArray();
 		for (int i = 0; i < array.size(); i++) {
 			JSONObject object = (JSONObject) array.get(i);
 			object.put("servicename",
-					new ServiceModel().search(object.get("sid").toString()).get("serviceName").toString());
+					new ServiceModel().search(object.get("sid").toString())
+							.get("serviceName").toString());
 			insInfo.add(object);
 		}
 		return insInfo;
@@ -148,7 +171,8 @@ public class insModel {
 
 	@SuppressWarnings("unchecked")
 	public JSONObject getServiceName(JSONObject object) {
-		JSONObject object2 = new ServiceModel().search(object.get("sid").toString());
+		JSONObject object2 = new ServiceModel()
+				.search(object.get("sid").toString());
 		if (object2 != null) {
 			object.put("servicename", object2.get("serviceName").toString());
 		}
@@ -163,6 +187,9 @@ public class insModel {
 			break;
 		case 1:
 			msg = "必填字段为空!";
+			break;
+		case 2:
+			msg = "该服务下该实例已存在!";
 			break;
 		default:
 			msg = "其他操作异常";

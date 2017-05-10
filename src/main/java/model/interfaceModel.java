@@ -13,6 +13,7 @@ import esayhelper.jGrapeFW_Message;
 
 public class interfaceModel {
 	private static DBHelper appinterface;
+	private JSONObject _obj = new JSONObject();
 	// private static formHelper _form;
 
 	static {
@@ -21,18 +22,16 @@ public class interfaceModel {
 	}
 
 	public String insert(JSONObject interfaceInfo) {
-		if (interfaceInfo.containsKey("id")) {
-			interfaceInfo.remove("id");
-		}
-		Object info = appinterface.data(interfaceInfo).insertOnce();
-		return find(info.toString()).toString();
+		String info = appinterface.data(interfaceInfo).insertOnce().toString();
+		return resultMessage(find(info));
 	}
 
 	public int update(String aid, JSONObject interfaceInfo) {
 		if (interfaceInfo.containsKey("id")) {
 			interfaceInfo.remove("id");
 		}
-		return appinterface.eq("id", aid).data(interfaceInfo).update() != null ? 0 : 99;
+		return appinterface.eq("id", aid).data(interfaceInfo).update() != null
+				? 0 : 99;
 	}
 
 	public int delete(String aid) {
@@ -47,56 +46,68 @@ public class interfaceModel {
 		return appinterface.deleteAll() != ids.length ? 0 : 99;
 	}
 
-	public JSONArray search(JSONObject appinterfaceInfo) {
+	public String search(JSONObject appinterfaceInfo) {
 		for (Object object2 : appinterfaceInfo.keySet()) {
-			appinterface.eq(object2.toString(), appinterfaceInfo.get(object2.toString()));
+			appinterface.eq(object2.toString(),
+					appinterfaceInfo.get(object2.toString()));
 		}
-		return appinterface.limit(20).select();
+		JSONArray array = appinterface.limit(20).select();
+		return resultMessage(array);
 	}
 
-	public JSONArray search(String classid) {
-		return appinterface.eq("appclsid", classid).limit(20).select();
+	public String search(String classid) {
+		JSONArray array = appinterface.eq("appclsid", classid).limit(20)
+				.select();
+		return resultMessage(array);
 	}
+
 	public JSONObject find(String id) {
 		return appinterface.eq("id", id).find();
 	}
 
 	@SuppressWarnings("unchecked")
-	public JSONObject page(int idx, int pageSize) {
+	public String page(int idx, int pageSize) {
 		JSONArray array = appinterface.page(idx, pageSize);
 		JSONObject object = new JSONObject();
-		object.put("totalSize", (int) Math.ceil((double) appinterface.count() / pageSize));
+		object.put("totalSize",
+				(int) Math.ceil((double) appinterface.count() / pageSize));
 		object.put("currentPage", idx);
 		object.put("pageSize", pageSize);
 		object.put("data", array);
-		return object;
+		return resultMessage(object);
 	}
 
 	@SuppressWarnings("unchecked")
-	public JSONObject page(int idx, int pageSize, JSONObject userInfo) {
+	public String page(int idx, int pageSize, JSONObject userInfo) {
 		for (Object object2 : userInfo.keySet()) {
-			appinterface.eq(object2.toString(), userInfo.get(object2.toString()));
+			appinterface.eq(object2.toString(),
+					userInfo.get(object2.toString()));
 		}
-		JSONArray array = appinterface.page(idx, pageSize);
+		JSONArray array = appinterface.dirty().page(idx, pageSize);
 		JSONObject object = new JSONObject();
-		object.put("totalSize", (int) Math.ceil((double) appinterface.count() / pageSize));
+		object.put("totalSize",
+				(int) Math.ceil((double) appinterface.count() / pageSize));
 		object.put("currentPage", idx);
 		object.put("pageSize", pageSize);
 		object.put("data", array);
-		return object;
+		return resultMessage(object);
 	}
+
 	/**
 	 * 将map添加至JSONObject
+	 * 
 	 * @param map
 	 * @param object
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")
-	public JSONObject AddMap(HashMap<String, Object> map,JSONObject object) {
-		if (map.entrySet()!=null) {
-			Iterator<Entry<String, Object>> iterator = map.entrySet().iterator();
+	public JSONObject AddMap(HashMap<String, Object> map, JSONObject object) {
+		if (map.entrySet() != null) {
+			Iterator<Entry<String, Object>> iterator = map.entrySet()
+					.iterator();
 			while (iterator.hasNext()) {
-				Map.Entry<String, Object> entry = (Map.Entry<String, Object>) iterator.next();
+				Map.Entry<String, Object> entry = (Map.Entry<String, Object>) iterator
+						.next();
 				if (!object.containsKey(entry.getKey())) {
 					object.put(entry.getKey(), entry.getValue());
 				}
@@ -104,6 +115,19 @@ public class interfaceModel {
 		}
 		return object;
 	}
+
+	@SuppressWarnings("unchecked")
+	private String resultMessage(JSONObject object) {
+		_obj.put("records", object);
+		return resultMessage(0, _obj.toString());
+	}
+
+	@SuppressWarnings("unchecked")
+	private String resultMessage(JSONArray array) {
+		_obj.put("records", array);
+		return resultMessage(0, _obj.toString());
+	}
+
 	public String resultMessage(int num, String message) {
 		String msg = "";
 		switch (num) {
