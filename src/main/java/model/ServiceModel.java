@@ -20,7 +20,7 @@ public class ServiceModel {
 	private JSONObject _obj = new JSONObject();
 
 	static {
-		service = new DBHelper("mysql", "services", "id");
+		service = new DBHelper("localdb", "services", "id");
 		_form = service.getChecker();
 	}
 

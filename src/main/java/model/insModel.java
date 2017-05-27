@@ -9,9 +9,11 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import esayhelper.DBHelper;
+import esayhelper.JSONHelper;
 import esayhelper.formHelper;
 import esayhelper.jGrapeFW_Message;
 import esayhelper.formHelper.formdef;
+import interfaceApplication.appsServer;
 import jodd.util.ArraysUtil;
 
 public class insModel {
@@ -20,7 +22,7 @@ public class insModel {
 	private JSONObject _obj = new JSONObject();
 
 	static {
-		ins = new DBHelper("localdb", "ins");
+		ins = new DBHelper("localdb", "ins", "id");
 		_form = ins.getChecker();
 	}
 
@@ -34,11 +36,16 @@ public class insModel {
 		}
 		if (find(insInfo.get("sid").toString(),
 				insInfo.get("configName").toString(),
-				insInfo.get("sysid").toString())!=null) {
+				insInfo.get("sysid").toString()) != null) {
 			return resultMessage(2, "");
 		}
 		String info = ins.data(insInfo).insertOnce().toString();
-
+//		String message = new appsServer()
+//				.appUpdateMeta(insInfo.get("sysid").toString(), info);
+//		int code = 
+//		if (JSONHelper.string2json(message).get("message").toString()) {
+//			
+//		}
 		return getServiceName(find(info.toString())).toString();
 	}
 
@@ -161,6 +168,8 @@ public class insModel {
 		JSONArray insInfo = new JSONArray();
 		for (int i = 0; i < array.size(); i++) {
 			JSONObject object = (JSONObject) array.get(i);
+			object.put("configName", JSONHelper
+					.string2json(object.get("configName").toString()));
 			object.put("servicename",
 					new ServiceModel().search(object.get("sid").toString())
 							.get("serviceName").toString());

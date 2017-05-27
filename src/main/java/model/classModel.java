@@ -19,7 +19,7 @@ public class classModel {
 	private JSONObject _obj = new JSONObject();
 
 	static {
-		appclass = new DBHelper("mysql", "appclass");
+		appclass = new DBHelper("localdb", "appclass");
 		form = appclass.getChecker();
 	}
 

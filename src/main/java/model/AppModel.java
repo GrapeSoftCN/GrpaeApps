@@ -22,8 +22,7 @@ public class AppModel {
 	private JSONObject _obj = new JSONObject();
 
 	static {
-		System.out.println(appsProxy.configValue());
-		appserver = new DBHelper("mysql", "apps", "id");
+		appserver = new DBHelper("localdb", "apps", "id");
 		_form = appserver.getChecker();
 	}
 
