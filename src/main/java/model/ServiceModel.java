@@ -13,6 +13,7 @@ import esayhelper.DBHelper;
 import esayhelper.formHelper;
 import esayhelper.jGrapeFW_Message;
 import esayhelper.formHelper.formdef;
+import nlogger.nlogger;
 
 public class ServiceModel {
 	private static DBHelper service;
@@ -29,11 +30,19 @@ public class ServiceModel {
 	}
 
 	public String insert(JSONObject serviceInfo) {
+		JSONObject object = null;
 		if (!_form.checkRuleEx(serviceInfo)) {
 			return resultMessage(1, ""); // 非空字段验证
 		}
-		String info = service.data(serviceInfo).insertOnce().toString();
-		return resultMessage(search(info));
+		try {
+			object = new JSONObject();
+			String info = service.data(serviceInfo).insertOnce().toString();
+			object = search(info);
+		}catch(Exception e){
+			nlogger.logout(e);
+			object = null;
+		}
+		return resultMessage(object);
 	}
 
 	public int update(String aid, JSONObject serviceInfo) {
@@ -142,6 +151,9 @@ public class ServiceModel {
 
 	@SuppressWarnings("unchecked")
 	public String resultMessage(JSONObject object) {
+		if (object==null) {
+			object = new JSONObject();
+		}
 		_obj.put("records", object);
 		return resultMessage(0, _obj.toString());
 	}
